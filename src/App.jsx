@@ -1,26 +1,57 @@
-import { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import Navbar from './components/Navbar'
+import Hero from './components/Hero'
+import Preloader from './components/Preloader'
+import { Features, UseCasesTabs, Stats, CaseStudies, Pricing, Comparison, Testimonials, Integrations, Blog, Contact, Footer } from './components/Sections'
+import './index.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem('theme')
+    return saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+  })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark')
+    localStorage.setItem('theme', theme)
+  }, [theme])
+
+  useEffect(() => {
+    const id = setTimeout(() => setLoading(false), 800)
+    return () => clearTimeout(id)
+  }, [])
+
+  useEffect(() => {
+    const metaTitle = document.querySelector('title')
+    if (metaTitle) metaTitle.textContent = 'Auralyst AI – Premium AI SaaS Landing'
+    const desc = document.querySelector('meta[name="description"]')
+    if (!desc) {
+      const m = document.createElement('meta')
+      m.name = 'description'
+      m.content = 'Launch AI agents faster. Voice, chat, workflows and analytics in one beautiful platform.'
+      document.head.appendChild(m)
+    }
+  }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Vibe Coding Platform
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Your AI-powered development environment
-        </p>
-        <div className="text-center">
-          <button
-            onClick={() => setCount(count + 1)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-          >
-            Count is {count}
-          </button>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-pastel.pink via-pastel.blue to-pastel.purple text-gray-900 dark:text-gray-100">
+      {loading && <Preloader />}
+      <Navbar theme={theme} onToggleTheme={() => setTheme(theme==='dark'?'light':'dark')} />
+      <main>
+        <Hero />
+        <Features />
+        <Stats />
+        <UseCasesTabs />
+        <CaseStudies />
+        <Pricing />
+        <Comparison />
+        <Testimonials />
+        <Integrations />
+        <Blog />
+        <Contact />
+      </main>
+      <Footer />
     </div>
   )
 }
